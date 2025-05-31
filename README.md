@@ -1,4 +1,4 @@
-# ADK Hackathon
+# ADK Hackathon Procerement Negotiator agent
 
 Welcome to the ADK Hackathon project!
 
