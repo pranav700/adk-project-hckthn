@@ -1,7 +1,9 @@
 'use client';
 
+import { ReactNode } from "react";
+
 interface StepContentProps {
-  description: string;
+  description: ReactNode;
 }
 
 export default function StepContent({ description }: StepContentProps) {

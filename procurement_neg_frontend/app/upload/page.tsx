@@ -1,21 +1,37 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { JSX, ReactNode, useEffect, useRef, useState } from 'react';
 import RequestInput from '@/components/RequestInput';
 import StepTabs from '@/components/StepTabs';
 import StepContent from '@/components/StepContent';
-import { APP_NAME, getNextRequestId, PROCUREMENT_STEPS, SESSION_ID, USER_ID } from '@/lib/constants';
+import { APP_NAME, getNextRequestId, PROCUREMENT_AGENTS, PROCUREMENT_STEPS, SESSION_ID, USER_ID } from '@/lib/constants';
 import { startProcurement } from '@/lib/api/sse/startProcurementSSE';
 import { createSession } from '@/lib/api/rest/startSession';
+import OverviewCard from '@/components/OverviewCard';
+import SupplierQuoteCard from '@/components/SupplierQuoteCard';
+import StrategyCard from '@/components/StrategyCard';
+import EmailDraftEditor from '@/components/EmailDraftEditor';
 
 
 export default function UploadPage() {
   const [submitted, setSubmitted] = useState(false);
   const [workflowStep, setWorkflowStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
-  const [stepDescriptions, setStepDescriptions] = useState<string[]>([]);
+  const [stepDescriptions, setStepDescriptions] = useState<ReactNode[]>([]);
   const [sessionInfo, setSessionInfo] = useState<{ sessionId: string; appName: string; userId: string; } | null>(null);
   const hasInitialized = useRef(false);
+  const stepComponentMap: Record<string, (props: { data: any }) => JSX.Element> = {};
+
+  const agentToComponent = {
+    doc_agent: OverviewCard,
+    analysis_agent: SupplierQuoteCard,
+    strategy_agent: StrategyCard,
+    comms_agent: EmailDraftEditor,
+  };
+  PROCUREMENT_AGENTS.forEach(agent => {
+    const Component = agentToComponent[agent as keyof typeof agentToComponent] || OverviewCard; // fallback component
+    stepComponentMap[agent] = (props) => <Component quote={props.data} />;
+  });
 
 
   useEffect(() => {
@@ -50,13 +66,7 @@ export default function UploadPage() {
       const base64Data = dataUrl.split(',')[1];
       const inlineData = { data: base64Data, mimeType: file.type };
 
-
-
-
-      //setTimeout(() => setWorkflowStep(2), 2000);
-      //setTimeout(() => setWorkflowStep(3), 4000);
-
-      const descriptions: string[] = [];
+      const descriptions: ReactNode[] = [];
 
       if (
         sessionInfo &&
@@ -71,7 +81,21 @@ export default function UploadPage() {
           sessionInfo.sessionId,
           inlineData,
           (step, description, index) => {
-            descriptions[index] = description;
+            try {
+              description = description.replace(/```json|```/g, '').trim();
+              const parsed = JSON.parse(description)
+              const Component = stepComponentMap[step];
+
+              if (Component) {
+                descriptions[index] = <Component data={parsed} />;
+              }
+              else {
+                descriptions[index] = description;
+              }
+            } catch (e) {
+              descriptions[index] = description;
+            }
+
             setStepDescriptions([...descriptions]);
             setWorkflowStep(index + 1);
           }

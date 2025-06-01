@@ -26,13 +26,13 @@ You have access to the `get_date` tool to get TODAY's date. Always call it to de
 Return a JSON object conforming to the following 'Strategy' schema:
 
 {
-  "supplier name": string,
-  "email subject": string, // e.g. "Follow-up on RFQ #12345"
+  "supplier_name": string,
+  "email_subject": string, // e.g. "Follow-up on RFQ #12345"
   "counter_offer_rows": [
     {
       "sku": string,
       "item": string,
-      "counter price": number // use target price from Benchmark
+      "counter_price": number // use target price from Benchmark
     }
   ],
   "concession_plan": [

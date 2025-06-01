@@ -20,18 +20,18 @@ doc_parser_agent = LlmAgent(
       When you are done, output ONLY valid JSON that passes the schema:
 
       {
-        "supplier name": string,           // e.g. "Асве Metals Ltd."
-        "supplier email": string,          // one address, lowercase
-        "quote date": string | null,       // ISO-8601 date (YYYY-MM-DD)
+        "supplier_name": string,           // e.g. "Асве Metals Ltd."
+        "supplier_email": string,          // one address, lowercase
+        "quote_date": string | null,       // ISO-8601 date (YYYY-MM-DD)
         "currency": string,                // 3-letter ISO (e.g. "USD")
-        "sku rows": [                      // one entry per line-item
+        "sku_rows": [                      // one entry per line-item
           {
             "item": string,                // name of item
             "sku": string,                 // exact vendor SKU/article, max 120 chars
             "description": string,
             "quantity": number,            // numeric value only
-            "unit of measure": string,     // e.g. "kg", "pcs"
-            "unit price": number,          // price per unit in quote currency
+            "unit_of_measure": string,     // e.g. "kg", "pcs"
+            "unit_price": number,          // price per unit in quote currency
             "Incoterms": string | null     // uppercase Incoterm (e.g. "FOB"); null if absent
           }
         ]

@@ -13,6 +13,8 @@ interface Props {
 export default function RequestInput({ onSubmit, showFileInput = true }: Props) {
   const [prompt, setPrompt] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const isSubmitDisabled = !prompt.trim() || (showFileInput && !file);
+
 
   return (
     <div className="space-y-4 bg-white p-6 rounded-xl shadow">
@@ -28,7 +30,7 @@ export default function RequestInput({ onSubmit, showFileInput = true }: Props) 
           {file && <span className="text-sm text-gray-600">{file.name}</span>}
         </div>
       )}
-      <Button onClick={() => onSubmit(file, prompt)}>Submit</Button>
+      <Button disabled={isSubmitDisabled} onClick={() => onSubmit(file, prompt)}>Submit</Button>
     </div>
   );
 }

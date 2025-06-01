@@ -68,9 +68,9 @@ analysis_agent = LlmAgent(
       3. Return output matching **exactly** this JSON schema:
 
       {
-        "supplier name": string,
+        "supplier_name": string,
         "summary": string, // max 280 chars plain English; state overall delta
-        "sku rows": [
+        "sku_rows": [
           {
             "item": string,
             "sku": string,
