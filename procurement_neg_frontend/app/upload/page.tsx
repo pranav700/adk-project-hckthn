@@ -11,6 +11,8 @@ import OverviewCard from '@/components/OverviewCard';
 import SupplierQuoteCard from '@/components/SupplierQuoteCard';
 import StrategyCard from '@/components/StrategyCard';
 import EmailDraftEditor from '@/components/EmailDraftEditor';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 
 export default function UploadPage() {
@@ -21,6 +23,12 @@ export default function UploadPage() {
   const [sessionInfo, setSessionInfo] = useState<{ sessionId: string; appName: string; userId: string; } | null>(null);
   const hasInitialized = useRef(false);
   const stepComponentMap: Record<string, (props: { data: any }) => JSX.Element> = {};
+  const [progress, setProgress] = useState(0);
+  const totalSteps = PROCUREMENT_STEPS.length;
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
+  const [customMessage, setCustomMessage] = useState("Processing your procurement request...");
+
+
 
   const agentToComponent = {
     doc_agent: OverviewCard,
@@ -54,6 +62,8 @@ export default function UploadPage() {
 
 
   const handleSubmit = async (file: File | null, prompt: string) => {
+    setShowProgressDialog(true);
+    setCustomMessage("Our Agents are analysing your file and generating insights...");
     const id = getNextRequestId();
     localStorage.setItem('request-id', id);
     setSubmitted(true);
@@ -82,6 +92,8 @@ export default function UploadPage() {
           inlineData,
           (step, description, index) => {
             try {
+              setCustomMessage(`Running step ${index + 1}: ${step.replace(/_/g, ' ')}`);
+              setProgress(Math.round(((index + 1) / totalSteps) * 100));
               description = description.replace(/```json|```/g, '').trim();
               const parsed = JSON.parse(description)
               const Component = stepComponentMap[step];
@@ -98,6 +110,9 @@ export default function UploadPage() {
 
             setStepDescriptions([...descriptions]);
             setWorkflowStep(index + 1);
+            setCustomMessage(`Agents have analysed your file`);
+            setProgress(Math.round(((index + 1) / totalSteps) * 100));
+
           }
         );
       } else {
@@ -109,7 +124,34 @@ export default function UploadPage() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
-      <h2 className="text-2xl font-bold text-blue-800">Procurement Request</h2>
+      <h2 className="text-l font-bold text-blue-800">Procurement Request: Upload your file and our agents will do all heavy lifting</h2>
+
+      <Dialog open={showProgressDialog} onOpenChange={setShowProgressDialog}>
+        <DialogContent className="max-w-md sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-blue-700">
+              {customMessage}
+            </DialogTitle>
+            <DialogDescription>
+              Step {workflowStep} of {totalSteps}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Progress value={progress} className="mt-4" />
+
+          {/* <ul className="list-disc list-inside text-sm text-gray-700 mt-4 space-y-1 max-h-48 overflow-y-auto">
+            {stepDescriptions.map((desc, i) => (
+              <li key={i}>
+                {typeof desc === "string" ? desc : `Step ${i + 1} completed.`}
+              </li>
+            ))}
+          </ul> */}
+
+          {progress === 100 && (
+            <div className="text-green-600 font-medium mt-4">All steps completed!</div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <RequestInput onSubmit={handleSubmit} showFileInput={true} />
 

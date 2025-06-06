@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import RequestInput from '@/components/RequestInput';
-import { startProcurementSSE } from '@/lib/api/sse/startProcurementSSE';
+import { startProcurement } from '@/lib/api/sse/startProcurementSSE';
 import { getNextRequestId, PROCUREMENT_STEPS } from '@/lib/constants';
 import { useState } from 'react';
 import StepTabs from '@/components/StepTabs';
@@ -30,7 +30,7 @@ export default function RequestDetail() {
 
     const descriptions: string[] = [];
 
-    startProcurementSSE(prompt, (step, description, index) => {
+    startProcurement(prompt, "", "", "", {}, (step, description, index) => {
       descriptions[index] = description;
       setStepDescriptions([...descriptions]);
       setWorkflowStep(index + 1);
