@@ -52,5 +52,5 @@ jobs:
             --region $REGION \
             --platform managed \
             --allow-unauthenticated \
-            --quiet
+            --quiet \
             --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=False,GOOGLE_API_KEY= ${{secrets.V_API_KEY}},BQ_TABLE=${{secrets.BQ_TABLE}}"
