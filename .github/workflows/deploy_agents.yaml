@@ -47,8 +47,8 @@ jobs:
             .
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy $SERVICE \
-            --image $IMAGE:$GITHUB_SHA \
+          gcloud run deploy $NAME \
+            --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
             --region $REGION \
             --platform managed \
             --allow-unauthenticated \
