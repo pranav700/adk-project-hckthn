@@ -38,9 +38,12 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker buildx build --platform linux/amd64 --push -f ./procurement_neg_agents/Dockerfile \
-          -t ${{env.REGION}}--docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
-          -t ${{env.REGION}}--docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
+          docker buildx build \
+           --platform linux/amd64 \
+           --push \
+           -f ./procurement_neg_agents/Dockerfile \
+           -t ${{env.REGION}}--docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
+           -t ${{env.REGION}}--docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy $SERVICE \
