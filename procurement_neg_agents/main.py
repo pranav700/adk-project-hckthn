@@ -7,9 +7,12 @@ from api.generate_request_id import router as generate_request_id_router
 from api.save_version import router as save_version_router
 from api.get_versions import router as get_versions_router
 from api.get_latest_version import router as get_latest_version_router
+import logging
 
 # Get the directory where main.py is located
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__)) + "\\agents"
+logging.info(f"Agent directory: {AGENT_DIR}")
+
 # Example session DB URL (e.g., SQLite)
 # SESSION_DB_URL = "sqlite:///./sessions.db"
 # Example allowed origins for CORS
