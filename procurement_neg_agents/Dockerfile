@@ -7,4 +7,4 @@ COPY procurement_neg_agents/ .
 
 EXPOSE 8080 443 80
 
-CMD ["python", "-m", "main.py"]
+CMD ["python", "main.py"]
