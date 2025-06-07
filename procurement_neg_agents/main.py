@@ -8,6 +8,9 @@ from api.generate_request_id import router as generate_request_id_router
 from api.save_version import router as save_version_router
 from api.get_versions import router as get_versions_router
 from api.get_latest_version import router as get_latest_version_router
+from api.dashboard import router as dashboard_router
+from api.update_status import router as update_status_router
+
 import logging
 
 # Get the directory where main.py is located
@@ -36,6 +39,8 @@ app.include_router(generate_request_id_router)
 app.include_router(save_version_router)
 app.include_router(get_versions_router)
 app.include_router(get_latest_version_router)
+app.include_router(dashboard_router)
+app.include_router(update_status_router)
 # You can add more FastAPI routes or configurations below if needed
 # Example:
 # @app.get("/hello")
