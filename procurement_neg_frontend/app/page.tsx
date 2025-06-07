@@ -4,37 +4,17 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { DashboardEntry, fetchDashboardData } from '@/lib/api/rest/dashboard';
 
-const history = [
-  {
-    id: 'REQ-1001',
-    quote_id: 'Q-8723',
-    company: 'Acme Supplies Ltd.',
-    status: 'Accepted',
-    updated: '2025-05-25',
-  },
-  {
-    id: 'REQ-1002',
-    quote_id: 'Q-8821',
-    company: 'Global Trade Inc.',
-    status: 'Countered',
-    updated: '2025-05-24',
-  },
-  {
-    id: 'REQ-1003',
-    quote_id: 'Q-8899',
-    company: 'SmartTech Partners',
-    status: 'Pending',
-    updated: '2025-05-23',
-  },
-  {
-    id: 'REQ-1004',
-    quote_id: 'Q-8934',
-    company: 'Nova Procurement',
-    status: 'Rejected',
-    updated: '2025-05-22',
-  },
-];
+type RequestRecord = {
+  request_id: string;
+  quote_id: string;
+  company_name: string;
+  status: string;
+  last_updated: string;
+};
+
 
 
 const statusMap: Record<string, { label: string; color: string }> = {
@@ -45,6 +25,28 @@ const statusMap: Record<string, { label: string; color: string }> = {
 };
 
 export default function Dashboard() {
+
+  const [history, setHistory] = useState<DashboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchDashboardData();
+        setHistory(data);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+
+
+
   return (
     <div className="p-6 space-y-6 min-h-screen bg-gray-50">
       <div className="flex items-center justify-between">
@@ -68,12 +70,12 @@ export default function Dashboard() {
           </thead>
           <tbody>
             {history.map((req) => (
-              <tr key={req.id} className="border-t">
+              <tr key={req.request_id} className="border-t">
                 <td className="px-4 py-3 text-blue-600 font-medium hover:underline">
-                  <Link href={`/request/${req.id}`}>{req.id}</Link>
+                  <Link href={`/request/${req.request_id}`}>{req.request_id}</Link>
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-800">{req.quote_id}</td>
-                <td className="px-4 py-3 text-sm text-gray-800">{req.company}</td>
+                <td className="px-4 py-3 text-sm text-gray-800">{req.company_name}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusMap[req.status].color}`}
@@ -81,9 +83,9 @@ export default function Dashboard() {
                     {statusMap[req.status].label}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">{req.updated}</td>
+                <td className="px-4 py-3 text-sm text-gray-600">{req.last_updated}</td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/request/${req.id}`}>
+                  <Link href={`/request/${req.request_id}`}>
                     <ArrowRight className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
                   </Link>
                 </td>

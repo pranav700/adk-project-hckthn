@@ -17,6 +17,7 @@ def save_version(payload: dict = Body(...)):
         "app_name": payload["appName"],
         "version_ts": payload.get("timestamp"),
         "step_outputs": payload["stepOutputs"],
+        "quote_status": payload["quote_status"],
     }
     errors = client.insert_rows_json(BIGQUERY_TABLE, [row])
     if errors:

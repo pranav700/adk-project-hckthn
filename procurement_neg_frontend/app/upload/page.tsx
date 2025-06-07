@@ -13,6 +13,7 @@ import StrategyCard from '@/components/StrategyCard';
 import EmailDraftEditor from '@/components/EmailDraftEditor';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { generateRequestId, saveVersionToBQ } from '@/lib/api/rest/procurement';
 
 
 export default function UploadPage() {
@@ -64,7 +65,7 @@ export default function UploadPage() {
   const handleSubmit = async (file: File | null, prompt: string) => {
     setShowProgressDialog(true);
     setCustomMessage("Our Agents are analysing your file and generating insights...");
-    const id = getNextRequestId();
+    const id = await generateRequestId();
     localStorage.setItem('request-id', id);
     setSubmitted(true);
     setWorkflowStep(1);
@@ -77,6 +78,7 @@ export default function UploadPage() {
       const inlineData = { data: base64Data, mimeType: file.type };
 
       const descriptions: ReactNode[] = [];
+      const rawSteps: Record<string, any> = {}; // For BigQuery
 
       if (
         sessionInfo &&
@@ -96,6 +98,7 @@ export default function UploadPage() {
               setProgress(Math.round(((index + 1) / totalSteps) * 100));
               description = description.replace(/```json|```/g, '').trim();
               const parsed = JSON.parse(description)
+              rawSteps[step] = parsed;
               const Component = stepComponentMap[step];
 
               if (Component) {
@@ -115,6 +118,16 @@ export default function UploadPage() {
 
           }
         );
+        await saveVersionToBQ({
+          requestId: id,
+          userId: sessionInfo.userId,
+          sessionId: sessionInfo.sessionId,
+          appName: sessionInfo.appName,
+          timestamp: new Date().toISOString(),
+          stepOutputs: rawSteps,
+          quote_status: 'pending',
+        });
+
       } else {
         console.error('Session information is missing.');
       }
