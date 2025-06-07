@@ -69,28 +69,42 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {history.map((req) => (
-              <tr key={req.request_id} className="border-t">
-                <td className="px-4 py-3 text-blue-600 font-medium hover:underline">
-                  <Link href={`/request/${req.request_id}`}>{req.request_id}</Link>
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-800">{req.quote_id}</td>
-                <td className="px-4 py-3 text-sm text-gray-800">{req.company_name}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusMap[req.status].color}`}
-                  >
-                    {statusMap[req.status].label}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-600">{req.last_updated}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link href={`/request/${req.request_id}`}>
-                    <ArrowRight className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
-                  </Link>
+            {loading ? (
+              <tr>
+                <td colSpan={6} className="p-6 text-center text-gray-500">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : history.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-6 text-center text-gray-500">
+                  No records found.
+                </td>
+              </tr>
+            ) : (
+              history.map((req) => (
+                <tr key={req.request_id} className="border-t">
+                  <td className="px-4 py-3 text-blue-600 font-medium hover:underline">
+                    <Link href={`/request/${req.request_id}`}>{req.request_id}</Link>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-800">{req.quote_id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-800">{req.company_name}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusMap[req.status].color}`}
+                    >
+                      {statusMap[req.status].label}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{req.last_updated}</td>
+                  <td className="px-4 py-3 text-right">
+                    <Link href={`/request/${req.request_id}`}>
+                      <ArrowRight className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 

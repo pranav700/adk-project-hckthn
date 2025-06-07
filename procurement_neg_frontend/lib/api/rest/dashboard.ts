@@ -9,7 +9,7 @@ export type DashboardEntry = {
 };
 
 export async function fetchDashboardData(): Promise<DashboardEntry[]> {
-  const response = await fetch(`${BASE}/dashboard-data`);
+  const response = await fetch(`${BASE}/api/dashboard-data`);
   if (!response.ok) {
     throw new Error('Failed to fetch dashboard data');
   }

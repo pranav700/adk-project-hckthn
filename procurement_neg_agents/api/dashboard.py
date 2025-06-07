@@ -7,7 +7,7 @@ router = APIRouter()
 client = bigquery.Client()
 
 
-@router.get("/dashboard-data")
+@router.get("/api/dashboard-data")
 def get_dashboard_data():
     query = f"""
     SELECT 
