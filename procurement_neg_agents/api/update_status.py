@@ -8,16 +8,18 @@ router = APIRouter()
 client = bigquery.Client()
 
 
-@router.post("/update-status")
+@router.post("/api/update-status")
 def update_status(payload: StatusUpdate):
     query = f"""
     UPDATE `{BIGQUERY_TABLE}`
-    SET status = @status
+    SET quote_status = @quote_status
     WHERE request_id = @request_id
     """
     job_config = bigquery.QueryJobConfig(
         query_parameters=[
-            bigquery.ScalarQueryParameter("status", "STRING", payload.status.value),
+            bigquery.ScalarQueryParameter(
+                "quote_status", "STRING", payload.quote_status.value
+            ),
             bigquery.ScalarQueryParameter("request_id", "STRING", payload.request_id),
         ]
     )

@@ -11,10 +11,12 @@ interface EmailDraftData {
 
 interface EmailDraftEditorProps {
   quote: EmailDraftData;
+  onSend?: () => Promise<void>;
+
 }
 
 
-const EmailDraftEditor = ({ quote }: EmailDraftEditorProps) => {
+const EmailDraftEditor = ({ quote, onSend }: EmailDraftEditorProps) => {
   const [toEmail, setToEmail] = useState(quote.to ?? "");
   const [subject, setSubject] = useState(quote.subject);
   const [notification, setNotification] = useState("");
@@ -38,11 +40,16 @@ const EmailDraftEditor = ({ quote }: EmailDraftEditorProps) => {
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     // Simulated send action
     setNotification("Email sent successfully!");
-    setTimeout(() => setNotification(""), 2000);
+    setTimeout(() => setNotification(""), 5000);
+    if (onSend) {
+      await onSend(); // notify parent about send event
+    }
   };
+
+
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-2xl mt-10 space-y-6">
@@ -83,8 +90,8 @@ const EmailDraftEditor = ({ quote }: EmailDraftEditorProps) => {
           onClick={handleSend}
           disabled={!canSend}
           className={`px-4 py-2 rounded-md transition ${canSend
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-300 text-gray-600 cursor-not-allowed"
+            ? "bg-blue-600 text-white hover:bg-blue-700"
+            : "bg-gray-300 text-gray-600 cursor-not-allowed"
             }`}
         >
           Send Email

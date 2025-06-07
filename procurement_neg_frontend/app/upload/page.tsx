@@ -13,7 +13,8 @@ import StrategyCard from '@/components/StrategyCard';
 import EmailDraftEditor from '@/components/EmailDraftEditor';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { generateRequestId, saveVersionToBQ } from '@/lib/api/rest/procurement';
+import { generateRequestId, saveVersionToBQ, updateStatusApi } from '@/lib/api/rest/procurement';
+import StatusBadge from '@/components/StatusBadge';
 
 
 export default function UploadPage() {
@@ -28,6 +29,8 @@ export default function UploadPage() {
   const totalSteps = PROCUREMENT_STEPS.length;
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const [customMessage, setCustomMessage] = useState("Processing your procurement request...");
+  const [status, setStatus] = useState<'pending' | 'countered' | string>('pending');
+
 
 
 
@@ -39,13 +42,30 @@ export default function UploadPage() {
   };
   PROCUREMENT_AGENTS.forEach(agent => {
     const Component = agentToComponent[agent as keyof typeof agentToComponent] || OverviewCard; // fallback component
-    stepComponentMap[agent] = (props) => <Component quote={props.data} />;
+    stepComponentMap[agent] = (props) => {
+      if (agent === 'comms_agent') {
+        return (
+          <EmailDraftEditor
+            quote={props.data}
+            onSend={async () => {
+              try {
+                await updateStatusApi({ quote_status: 'countered', request_id: localStorage.getItem('request-id') || '' });
+                setStatus('countered');
+              } catch (e) {
+                // error handled inside updateStatus or here if needed
+              }
+            }}
+          />
+        );
+      }
+      return <Component quote={props.data} />;
+    };
   });
 
 
   useEffect(() => {
 
-
+    localStorage.removeItem('request-id');
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
@@ -65,8 +85,11 @@ export default function UploadPage() {
   const handleSubmit = async (file: File | null, prompt: string) => {
     setShowProgressDialog(true);
     setCustomMessage("Our Agents are analysing your file and generating insights...");
-    const id = await generateRequestId();
-    localStorage.setItem('request-id', id);
+    let id = localStorage.getItem('request-id');
+    if (!id) {
+      id = await generateRequestId();
+      localStorage.setItem('request-id', id);
+    }
     setSubmitted(true);
     setWorkflowStep(1);
     setActiveTab(0);
@@ -150,9 +173,27 @@ export default function UploadPage() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
-      <h2 className="text-l font-bold text-blue-800">Procurement Request: Upload your file and our agents will do all heavy lifting</h2>
+      <h2 className="text-l font-bold text-black-800 flex items-center space-x-3">
+        {submitted && (
+          <>
+            <span>Status:</span>
+            <StatusBadge status={status} />
+          </>
+        )}
+      </h2>
 
-      <Dialog open={showProgressDialog} onOpenChange={setShowProgressDialog}>
+
+
+      <Dialog open={showProgressDialog} onOpenChange={(open) => {
+        setShowProgressDialog(open);
+        if (!open) {
+          // Clear everything when dialog closes
+
+          setActiveTab(0);
+          setProgress(0);
+          setCustomMessage("Processing your procurement request...");
+        }
+      }}>
         <DialogContent className="max-w-md sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-blue-700">
@@ -179,7 +220,10 @@ export default function UploadPage() {
         </DialogContent>
       </Dialog>
 
-      <RequestInput onSubmit={handleSubmit} showFileInput={true} />
+      {!submitted && (
+        <><h2 className="text-l font-bold text-blue-800">Procurement Request: Upload your file and our agents will do all heavy lifting</h2>
+          <RequestInput onSubmit={handleSubmit} showFileInput={true} /></>
+      )}
 
       {submitted && (
         <div className="mt-8">

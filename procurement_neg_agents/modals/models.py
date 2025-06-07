@@ -12,4 +12,4 @@ class RequestStatus(str, Enum):
 # Payload for updating request status
 class StatusUpdate(BaseModel):
     request_id: str
-    status: RequestStatus
+    quote_status: RequestStatus

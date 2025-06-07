@@ -27,3 +27,20 @@ export async function saveVersionToBQ(payload: {
 
   return await res.json();
 }
+
+export const updateStatusApi = async (payload: {
+  request_id: string;
+  quote_status: string;
+}) => {
+
+  const response = await fetch(`${BASE}/api/update-status`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update status');
+  }
+};
+
