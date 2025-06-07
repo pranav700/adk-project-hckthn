@@ -3,10 +3,10 @@ from pydantic import BaseModel
 
 
 class RequestStatus(str, Enum):
-    accepted = "Accepted"
-    countered = "Countered"
-    pending = "Pending"
-    rejected = "Rejected"
+    accepted = "accepted"
+    countered = "countered"
+    pending = "pending"
+    rejected = "rejected"
 
 
 # Payload for updating request status
