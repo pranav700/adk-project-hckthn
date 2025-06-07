@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from google.cloud import bigquery
 
-from procurement_neg_agents.config.config import BIGQUERY_TABLE
+from config.config import BIGQUERY_TABLE
 
 router = APIRouter()
 client = bigquery.Client()
