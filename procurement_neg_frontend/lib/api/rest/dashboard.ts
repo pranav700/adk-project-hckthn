@@ -4,7 +4,7 @@ export type DashboardEntry = {
   request_id: string;
   quote_id: string;
   company_name: string;
-  status: string;
+  quote_status: string;
   last_updated: string;
 };
 

@@ -86,47 +86,60 @@ export default function UploadPage() {
         sessionInfo.userId &&
         sessionInfo.sessionId
       ) {
-        startProcurement(
-          prompt,
-          sessionInfo.appName,
-          sessionInfo.userId,
-          sessionInfo.sessionId,
-          inlineData,
-          (step, description, index) => {
-            try {
-              setCustomMessage(`Running step ${index + 1}: ${step.replace(/_/g, ' ')}`);
-              setProgress(Math.round(((index + 1) / totalSteps) * 100));
-              description = description.replace(/```json|```/g, '').trim();
-              const parsed = JSON.parse(description)
-              rawSteps[step] = parsed;
-              const Component = stepComponentMap[step];
+        try {
+          setCustomMessage("Starting procurement process...");
+          await new Promise<void>((resolve, reject) => {
+            startProcurement(
+              prompt,
+              sessionInfo.appName,
+              sessionInfo.userId,
+              sessionInfo.sessionId,
+              inlineData,
+              (step, description, index) => {
+                try {
+                  setCustomMessage(`Running step ${index + 1}: ${step.replace(/_/g, ' ')}`);
+                  setProgress(Math.round(((index + 1) / totalSteps) * 100));
+                  description = description.replace(/```json|```/g, '').trim();
+                  const parsed = JSON.parse(description)
+                  rawSteps[step] = parsed;
+                  const Component = stepComponentMap[step];
 
-              if (Component) {
-                descriptions[index] = <Component data={parsed} />;
-              }
-              else {
-                descriptions[index] = description;
-              }
-            } catch (e) {
-              descriptions[index] = description;
-            }
+                  if (Component) {
+                    descriptions[index] = <Component data={parsed} />;
+                  }
+                  else {
+                    descriptions[index] = description;
+                  }
+                } catch (e) {
+                  descriptions[index] = description;
+                }
 
-            setStepDescriptions([...descriptions]);
-            setWorkflowStep(index + 1);
-            setCustomMessage(`Agents have analysed your file`);
-            setProgress(Math.round(((index + 1) / totalSteps) * 100));
-
+                setStepDescriptions([...descriptions]);
+                setWorkflowStep(index + 1);
+                setCustomMessage(`Agents have analysed your file`);
+                setProgress(Math.round(((index + 1) / totalSteps) * 100));
+                if (index + 1 === totalSteps) {
+                  resolve();
+                }
+              })
           }
-        );
-        await saveVersionToBQ({
-          requestId: id,
-          userId: sessionInfo.userId,
-          sessionId: sessionInfo.sessionId,
-          appName: sessionInfo.appName,
-          timestamp: new Date().toISOString(),
-          stepOutputs: rawSteps,
-          quote_status: 'pending',
-        });
+          );
+        } catch (error) {
+          console.error('Error starting procurement:', error);
+        }
+        try {
+          await saveVersionToBQ({
+            requestId: id,
+            userId: sessionInfo.userId,
+            sessionId: sessionInfo.sessionId,
+            appName: sessionInfo.appName,
+            timestamp: new Date().toISOString(),
+            stepOutputs: JSON.stringify(rawSteps),
+            quote_status: 'pending',
+          });
+        } catch (error) {
+          console.error('Error saving version:', error);
+        }
 
       } else {
         console.error('Session information is missing.');

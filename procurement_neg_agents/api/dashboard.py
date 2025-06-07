@@ -12,8 +12,8 @@ def get_dashboard_data():
     query = f"""
     SELECT 
         request_id,
-        quote_id,
-        company_name,
+        JSON_EXTRACT_SCALAR(step_outputs, '$.doc_agent.quote_id') AS quote_id,
+      JSON_EXTRACT_SCALAR(step_outputs, '$.doc_agent.supplier_name') AS company_name,
         quote_status,
         TIMESTAMP_MILLIS(MAX(UNIX_MILLIS(version_ts))) AS last_updated
     FROM `{BIGQUERY_TABLE}`

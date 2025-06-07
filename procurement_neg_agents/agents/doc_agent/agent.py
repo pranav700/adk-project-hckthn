@@ -22,6 +22,7 @@ doc_parser_agent = LlmAgent(
       {
         "supplier_name": string,           // e.g. "Асве Metals Ltd."
         "supplier_email": string,          // one address, lowercase
+        "quote_id": string | null, // quote number, max 50 chars; null if absent
         "quote_date": string | null,       // ISO-8601 date (YYYY-MM-DD)
         "currency": string,                // 3-letter ISO (e.g. "USD")
         "sku_rows": [                      // one entry per line-item

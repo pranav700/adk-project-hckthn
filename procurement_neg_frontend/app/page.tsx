@@ -8,21 +8,12 @@ import { useEffect, useState } from 'react';
 import { DashboardEntry, fetchDashboardData } from '@/lib/api/rest/dashboard';
 import { Icons } from '@/components/Icons';
 
-type RequestRecord = {
-  request_id: string;
-  quote_id: string;
-  company_name: string;
-  status: string;
-  last_updated: string;
-};
-
-
 
 const statusMap: Record<string, { label: string; color: string }> = {
-  Accepted: { label: "Accepted", color: "bg-green-100 text-green-800" },
-  Countered: { label: "Countered", color: "bg-yellow-100 text-yellow-800" },
-  Pending: { label: "Pending", color: "bg-blue-100 text-blue-800" },
-  Rejected: { label: "Rejected", color: "bg-red-100 text-red-800" },
+  accepted: { label: "Accepted", color: "bg-green-100 text-green-800" },
+  countered: { label: "Countered", color: "bg-yellow-100 text-yellow-800" },
+  pending: { label: "Pending", color: "bg-blue-100 text-blue-800" },
+  rejected: { label: "Rejected", color: "bg-red-100 text-red-800" },
 };
 
 export default function Dashboard() {
@@ -90,12 +81,19 @@ export default function Dashboard() {
                   <td className="px-4 py-3 text-sm text-gray-800">{req.company_name}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusMap[req.status].color}`}
+                      className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusMap[req.quote_status].color}`}
                     >
-                      {statusMap[req.status].label}
+                      {statusMap[req.quote_status].label}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{req.last_updated}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{new Date(req.last_updated).toLocaleString(undefined, {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  })}</td>
                   <td className="px-4 py-3 text-right">
                     <Link href={`/request/${req.request_id}`}>
                       <ArrowRight className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
