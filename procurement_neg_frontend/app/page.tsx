@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DashboardEntry, fetchDashboardData } from '@/lib/api/rest/dashboard';
+import { Icons } from '@/components/Icons';
 
 type RequestRecord = {
   request_id: string;
@@ -44,9 +45,6 @@ export default function Dashboard() {
     loadData();
   }, []);
 
-
-
-
   return (
     <div className="p-6 space-y-6 min-h-screen bg-gray-50">
       <div className="flex items-center justify-between">
@@ -72,7 +70,8 @@ export default function Dashboard() {
             {loading ? (
               <tr>
                 <td colSpan={6} className="p-6 text-center text-gray-500">
-                  Loading...
+                  <Icons.spinner className="h-10 w-10 animate-spin" />
+
                 </td>
               </tr>
             ) : history.length === 0 ? (

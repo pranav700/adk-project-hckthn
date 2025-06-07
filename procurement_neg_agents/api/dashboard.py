@@ -15,7 +15,7 @@ def get_dashboard_data():
         quote_id,
         company_name,
         quote_status,
-        TIMESTAMP_MILLIS(MAX(UNIX_MILLIS(timestamp))) AS last_updated
+        TIMESTAMP_MILLIS(MAX(UNIX_MILLIS(version_ts))) AS last_updated
     FROM `{BIGQUERY_TABLE}`
     GROUP BY request_id, quote_id, company_name, status
     ORDER BY last_updated DESC
