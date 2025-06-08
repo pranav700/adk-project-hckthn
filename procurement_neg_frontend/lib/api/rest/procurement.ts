@@ -15,7 +15,7 @@ export async function saveVersionToBQ(payload: {
   stepOutputs: any;
   quote_status: string;
 }) {
-  const res = await fetch(`${BASE}/api/save-version-bq`, {
+  const res = await fetch(`${BASE}/api/save-version`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
