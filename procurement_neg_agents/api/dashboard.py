@@ -26,7 +26,8 @@ def get_dashboard_data():
             if hasattr(ts, "to_datetime"):
                 last_updated = ts.to_datetime()
             elif isinstance(ts, str):
-                last_updated = datetime.fromisoformat(ts)
+                ts_fixed = ts.replace("Z", "+00:00")
+                last_updated = datetime.fromisoformat(ts_fixed)
             else:
                 last_updated = ts  # fallback, might be None
 
