@@ -1,30 +1,34 @@
 from fastapi import APIRouter, HTTPException
-from google.cloud import bigquery
-
-from config.config import BIGQUERY_TABLE
+from google.cloud import firestore
 from modals.models import StatusUpdate
 
 router = APIRouter()
-client = bigquery.Client()
+db = firestore.Client()
 
 
 @router.post("/api/update-status")
 def update_status(payload: StatusUpdate):
-    query = f"""
-    UPDATE `{BIGQUERY_TABLE}`
-    SET quote_status = @quote_status
-    WHERE request_id = @request_id
-    """
-    job_config = bigquery.QueryJobConfig(
-        query_parameters=[
-            bigquery.ScalarQueryParameter(
-                "quote_status", "STRING", payload.quote_status.value
-            ),
-            bigquery.ScalarQueryParameter("request_id", "STRING", payload.request_id),
-        ]
-    )
     try:
-        client.query(query, job_config=job_config).result()
-        return {"success": True, "message": f"Status updated to {payload.status.value}"}
+        # Query for the latest document matching the request_id
+        docs = (
+            db.collection("procurement_versions")
+            .where("request_id", "==", payload.request_id)
+            .order_by("version_ts", direction=firestore.Query.DESCENDING)
+            .limit(1)
+            .stream()
+        )
+
+        doc = next(docs, None)
+        if not doc:
+            raise HTTPException(status_code=404, detail="Request ID not found.")
+
+        # Update the quote_status field in the latest document
+        doc.reference.update({"quote_status": payload.quote_status.value})
+
+        return {
+            "success": True,
+            "message": f"Status updated to {payload.quote_status.value}",
+        }
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

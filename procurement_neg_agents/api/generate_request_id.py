@@ -2,13 +2,11 @@
 
 import random
 import string
-from fastapi import APIRouter
-from google.cloud import bigquery
-from config.config import BIGQUERY_TABLE
-
+from fastapi import APIRouter, HTTPException
+from google.cloud import firestore
 
 router = APIRouter()
-client = bigquery.Client()
+db = firestore.Client()
 
 
 def generate_candidate_id():
@@ -19,15 +17,10 @@ def generate_candidate_id():
 def generate_request_id():
     for _ in range(10):
         request_id = generate_candidate_id()
-        query = f"SELECT COUNT(*) as count FROM `{BIGQUERY_TABLE}` WHERE request_id = @request_id"
-        job = client.query(
-            query,
-            job_config=bigquery.QueryJobConfig(
-                query_parameters=[
-                    bigquery.ScalarQueryParameter("request_id", "STRING", request_id)
-                ]
-            ),
-        )
-        if list(job.result())[0].count == 0:
+
+        # Check existence in Firestore (e.g., in "procurement_versions" collection)
+        existing_doc = db.collection("procurement_versions").document(request_id).get()
+        if not existing_doc.exists:
             return {"id": request_id}
-    raise Exception("Unable to generate unique request ID.")
+
+    raise HTTPException(status_code=500, detail="Unable to generate unique request ID.")

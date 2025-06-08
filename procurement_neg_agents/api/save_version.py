@@ -1,25 +1,29 @@
 # routes/save_version.py
 
-from fastapi import APIRouter, Body
-from google.cloud import bigquery
-from config.config import BIGQUERY_TABLE
+from fastapi import APIRouter, Body, HTTPException
+from google.cloud import firestore
 
 router = APIRouter()
-client = bigquery.Client()
+db = firestore.Client()
 
 
-@router.post("/api/save-version-bq")
+@router.post("/api/save-version")
 def save_version(payload: dict = Body(...)):
-    row = {
-        "request_id": payload["requestId"],
-        "user_id": payload["userId"],
-        "session_id": payload["sessionId"],
-        "app_name": payload["appName"],
-        "version_ts": payload.get("timestamp"),
-        "step_outputs": payload["stepOutputs"],
-        "quote_status": payload["quote_status"],
-    }
-    errors = client.insert_rows_json(BIGQUERY_TABLE, [row])
-    if errors:
-        raise Exception(f"BigQuery insert failed: {errors}")
-    return {"status": "ok"}
+    try:
+        doc_data = {
+            "request_id": payload["requestId"],
+            "user_id": payload["userId"],
+            "session_id": payload["sessionId"],
+            "app_name": payload["appName"],
+            "version_ts": payload.get("timestamp"),
+            "step_outputs": payload["stepOutputs"],
+            "quote_status": payload["quote_status"],
+        }
+
+        # Optionally use a generated document ID, or a timestamp-based key
+        db.collection("procurement_versions").add(doc_data)
+
+        return {"status": "ok"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

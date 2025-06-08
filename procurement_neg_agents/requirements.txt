@@ -52,6 +52,7 @@ google-api-core[grpc]==2.25.0rc1
     #   google-cloud-aiplatform
     #   google-cloud-bigquery
     #   google-cloud-core
+    #   google-cloud-firestore
     #   google-cloud-resource-manager
     #   google-cloud-secret-manager
     #   google-cloud-speech
@@ -67,6 +68,7 @@ google-auth==2.40.2
     #   google-cloud-aiplatform
     #   google-cloud-bigquery
     #   google-cloud-core
+    #   google-cloud-firestore
     #   google-cloud-resource-manager
     #   google-cloud-secret-manager
     #   google-cloud-speech
@@ -82,7 +84,10 @@ google-cloud-bigquery==3.34.0
 google-cloud-core==2.4.3
     # via
     #   google-cloud-bigquery
+    #   google-cloud-firestore
     #   google-cloud-storage
+google-cloud-firestore==2.21.0
+    # via -r .\requirements.in
 google-cloud-resource-manager==1.14.2
     # via google-cloud-aiplatform
 google-cloud-secret-manager==2.23.3
@@ -181,6 +186,7 @@ proto-plus==1.26.1
     # via
     #   google-api-core
     #   google-cloud-aiplatform
+    #   google-cloud-firestore
     #   google-cloud-resource-manager
     #   google-cloud-secret-manager
     #   google-cloud-speech
@@ -189,6 +195,7 @@ protobuf==5.29.5
     # via
     #   google-api-core
     #   google-cloud-aiplatform
+    #   google-cloud-firestore
     #   google-cloud-resource-manager
     #   google-cloud-secret-manager
     #   google-cloud-speech
