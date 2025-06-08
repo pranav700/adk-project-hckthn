@@ -21,6 +21,7 @@ def get_dashboard_data():
             request_id = v.get("request_id")
             step_outputs = v.get("step_outputs", {})
             ts = v.get("timestamp") or v.get("version_ts")
+            quote_status = v.get("quote_status")
 
             # Firestore timestamps are usually Timestamp objects
             if hasattr(ts, "to_datetime"):
@@ -34,14 +35,6 @@ def get_dashboard_data():
             doc_agent = step_outputs.get("doc_agent", {})
             quote_id = doc_agent.get("quote_id")
             company_name = doc_agent.get("supplier_name")
-
-            # Fetch status document
-            status_doc = status_ref.document(request_id).get()
-            quote_status = (
-                status_doc.to_dict().get("quote_status")
-                if status_doc.exists
-                else "Pending"
-            )
 
             data.append(
                 {
