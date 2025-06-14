@@ -13,7 +13,7 @@ import StrategyCard from '@/components/StrategyCard';
 import EmailDraftEditor from '@/components/EmailDraftEditor';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { generateRequestId, saveVersionToBQ, updateStatusApi } from '@/lib/api/rest/procurement';
+import { generateRequestId, saveVersionApi, updateStatusApi } from '@/lib/api/rest/procurement';
 import StatusBadge from '@/components/StatusBadge';
 
 
@@ -143,7 +143,7 @@ export default function UploadPage() {
           console.error('Error starting procurement:', error);
         }
         try {
-          await saveVersionToBQ({
+          await saveVersionApi({
             requestId: id,
             userId: sessionInfo.userId,
             sessionId: sessionInfo.sessionId,
@@ -167,7 +167,8 @@ export default function UploadPage() {
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
       <h2 className="text-l font-bold text-black-800 flex items-center space-x-3">
         {submitted && (
-          <>
+          <><span> ReqID</span>
+            <span className="text-blue-600">{localStorage.getItem('request-id')}</span>
             <span>Status:</span>
             <StatusBadge status={status} />
           </>

@@ -12,7 +12,7 @@ export async function generateRequestId(): Promise<string> {
   return data.id;
 }
 
-export async function saveVersionToBQ(payload: {
+export async function saveVersionApi(payload: {
   requestId: string;
   userId: string;
   sessionId: string;

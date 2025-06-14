@@ -82,7 +82,7 @@ export default function Dashboard() {
                       {statusMap[req.quote_status].label}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{new Date(req.last_updated).toLocaleString(undefined, {
+                  <td className="px-4 py-3 text-sm text-gray-600">{new Date(req.last_updated).toLocaleString("en-GB", {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',
