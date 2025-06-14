@@ -35,7 +35,7 @@ export default function Dashboard() {
   return (
     <div className="p-6 space-y-6 min-h-screen bg-gray-50">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800">Procurement Dashboard</h1>
+        <h3 className="text-2xl font-semibold text-gray-800">Dashboard</h3>
         <Button asChild>
           <Link href="/upload">New Request</Link>
         </Button>

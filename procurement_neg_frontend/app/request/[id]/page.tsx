@@ -4,12 +4,15 @@ import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import RequestInput from '@/components/RequestInput';
 import { startProcurement } from '@/lib/api/sse/startProcurementSSE';
-import { getNextRequestId, PROCUREMENT_STEPS } from '@/lib/constants';
-import { useEffect, useState } from 'react';
+import { agentToComponent, getNextRequestId, PROCUREMENT_AGENTS, PROCUREMENT_STEPS } from '@/lib/constants';
+import { JSX, ReactNode, useEffect, useState } from 'react';
 import StepTabs from '@/components/StepTabs';
 import StepContent from '@/components/StepContent';
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from '@/components/ui/select';
 import { fetchVersionsByRequestId } from '@/lib/api/rest/procurement';
+import StatusBadge from '@/components/StatusBadge';
+import OverviewCard from '@/components/OverviewCard';
+import EmailDraftEditor from '@/components/EmailDraftEditor';
 
 export default function RequestDetail() {
   const router = useRouter();
@@ -18,7 +21,7 @@ export default function RequestDetail() {
   const [submitted, setSubmitted] = useState(false);
   const [workflowStep, setWorkflowStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
-  const [stepDescriptions, setStepDescriptions] = useState<string[]>([]);
+  const [stepDescriptions, setStepDescriptions] = useState<ReactNode[]>([]);
   const [latestStatus, setLatestStatus] = useState<string>('');
   const [versions, setVersions] = useState<any[]>([]);
   const [selectedVersionIndex, setSelectedVersionIndex] = useState<number>(0);
@@ -39,13 +42,40 @@ export default function RequestDetail() {
     fetchVersions();
   }, [id]);
 
-  const extractDescriptions = (stepOutputs: any): string[] => {
-    return PROCUREMENT_STEPS.map((step: string) => stepOutputs?.[step]?.description || 'No description available');
+  const stepComponentMap: Record<string, (props: { data: any }) => JSX.Element> = {};
+
+  PROCUREMENT_AGENTS.forEach(agent => {
+    const Component = agentToComponent[agent as keyof typeof agentToComponent] || OverviewCard;
+
+    stepComponentMap[agent] = (props) => {
+      if (agent === 'comms_agent') {
+        return (
+          <EmailDraftEditor
+            quote={props.data}
+            onSend={async () => {
+              // Add relevant logic for sending emails or countering here
+            }}
+          />
+        );
+      }
+      return <Component quote={props.data} />;
+    };
+  });
+
+
+  const extractDescriptions = (stepOutputs: any): ReactNode[] => {
+    return PROCUREMENT_AGENTS.map((step: string) => {
+      const data = stepOutputs?.[step];
+      const Component = stepComponentMap[step];
+      if (Component && data) {
+        return <Component data={data} />;
+      } else {
+        return "No description available";
+      }
+    });
   };
 
   const handleSubmit = async (file: File | null, prompt: string) => {
-    const req_id = getNextRequestId();
-    localStorage.setItem('request-id', req_id);
     setUploadedFileName(file?.name || null);
     setSubmitted(true);
     setWorkflowStep(1);
@@ -56,11 +86,19 @@ export default function RequestDetail() {
 
     const descriptions: string[] = [];
 
-    startProcurement(prompt, "", "", "", {}, (step, description, index) => {
-      descriptions[index] = description;
-      setStepDescriptions([...descriptions]);
-      setWorkflowStep(index + 1);
-    });
+    const latestVersion = versions[0];
+    startProcurement(
+      prompt,
+      latestVersion?.app_name,
+      latestVersion?.user_id,
+      latestVersion?.session_id,
+      {},
+      (step, description, index) => {
+        descriptions[index] = description;
+        setStepDescriptions([...descriptions]);
+        setWorkflowStep(index + 1);
+      }
+    );
   };
 
   const handleVersionChange = (index: string) => {
@@ -88,13 +126,13 @@ export default function RequestDetail() {
               activeStep={activeTab}
               workflowStep={workflowStep}
               onTabClick={setActiveTab}
-            //orientation="vertical"
+              orientation="vertical"
             />
           </div>
 
           <div className="flex-1 space-y-4">
             <div className="text-sm text-gray-700">
-              <span className="font-semibold">Latest Status:</span> {latestStatus}
+              <span className="font-semibold">Latest Status:</span><StatusBadge status={latestStatus} />
             </div>
 
             <div>
@@ -106,7 +144,7 @@ export default function RequestDetail() {
                 <SelectContent>
                   {versions.map((version, index) => (
                     <SelectItem key={index} value={index.toString()}>
-                      {new Date(version.version_ts).toLocaleString()}
+                      {new Date(version.version_ts).toLocaleString("en-GB",)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -119,7 +157,7 @@ export default function RequestDetail() {
 
         {/* Right column (File input + previously uploaded) */}
         <div className="md:w-1/3 space-y-4">
-          <RequestInput onSubmit={handleSubmit} showFileInput={true} />
+          <RequestInput onSubmit={handleSubmit} showFileInput={false} />
           {uploadedFileName && (
             <div className="text-sm text-gray-600">
               <span className="font-semibold">Uploaded File:</span> {uploadedFileName}

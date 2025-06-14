@@ -10,6 +10,12 @@ export async function startProcurement(
   inlineData: Record<string, any>,
   onStep: StepCallback
 ) {
+  const parts: any[] = [{ text: prompt }];
+
+  if (inlineData && Object.keys(inlineData).length > 0) {
+    parts.push({ inlineData });
+  }
+
   const res = await fetch(`${BASE}/run`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,7 +25,7 @@ export async function startProcurement(
       sessionId,
       newMessage: {
         role: 'user',
-        parts: [{ text: prompt }, { inlineData }],
+        parts: parts,
       },
       streaming: false,
     }),

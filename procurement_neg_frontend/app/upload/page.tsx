@@ -4,7 +4,7 @@ import { JSX, ReactNode, useEffect, useRef, useState } from 'react';
 import RequestInput from '@/components/RequestInput';
 import StepTabs from '@/components/StepTabs';
 import StepContent from '@/components/StepContent';
-import { APP_NAME, getNextRequestId, PROCUREMENT_AGENTS, PROCUREMENT_STEPS, SESSION_ID, USER_ID } from '@/lib/constants';
+import { agentToComponent, APP_NAME, getNextRequestId, PROCUREMENT_AGENTS, PROCUREMENT_STEPS, SESSION_ID, USER_ID } from '@/lib/constants';
 import { startProcurement } from '@/lib/api/sse/startProcurementSSE';
 import { createSession } from '@/lib/api/rest/startSession';
 import OverviewCard from '@/components/OverviewCard';
@@ -32,14 +32,6 @@ export default function UploadPage() {
   const [status, setStatus] = useState<'pending' | 'countered' | string>('pending');
 
 
-
-
-  const agentToComponent = {
-    doc_agent: OverviewCard,
-    analysis_agent: SupplierQuoteCard,
-    strategy_agent: StrategyCard,
-    comms_agent: EmailDraftEditor,
-  };
   PROCUREMENT_AGENTS.forEach(agent => {
     const Component = agentToComponent[agent as keyof typeof agentToComponent] || OverviewCard; // fallback component
     stepComponentMap[agent] = (props) => {

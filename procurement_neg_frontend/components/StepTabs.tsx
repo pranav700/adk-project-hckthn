@@ -7,6 +7,7 @@ interface StepTabsProps {
   activeStep: number;
   workflowStep: number;
   onTabClick: (index: number) => void;
+  orientation?: "horizontal" | "vertical";
 }
 
 export default function StepTabs({
@@ -14,9 +15,18 @@ export default function StepTabs({
   activeStep,
   workflowStep,
   onTabClick,
+  orientation = "horizontal",
 }: StepTabsProps) {
+  const isVertical = orientation === "vertical";
+
   return (
-    <div className="flex space-x-4 border-b">
+    <div
+      className={cn(
+        "space-y-2",
+        isVertical ? "flex flex-col" : "flex flex-row space-x-2"
+      )}
+    >
+      {/* <div className="flex space-x-4 border-b"> */}
       {steps.map((step, index) => {
         const isCompleted = index < workflowStep;
         const isActive = index === activeStep;
@@ -40,6 +50,7 @@ export default function StepTabs({
           </button>
         );
       })}
+      {/* </div> */}
     </div>
   );
 }

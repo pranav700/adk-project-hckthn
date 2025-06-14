@@ -1,3 +1,7 @@
+import EmailDraftEditor from '@/components/EmailDraftEditor';
+import OverviewCard from '@/components/OverviewCard';
+import StrategyCard from '@/components/StrategyCard';
+import SupplierQuoteCard from '@/components/SupplierQuoteCard';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -17,6 +21,13 @@ export const BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 export const APP_NAME = 'procurement_agent';
 export const USER_ID = 'u_123';
 export const SESSION_ID = uuidv4();
+
+export const agentToComponent = {
+  doc_agent: OverviewCard,
+  analysis_agent: SupplierQuoteCard,
+  strategy_agent: StrategyCard,
+  comms_agent: EmailDraftEditor,
+};
 
 export const statusMap: Record<string, { label: string; color: string }> = {
   accepted: { label: "Accepted", color: "bg-green-100 text-green-800" },
