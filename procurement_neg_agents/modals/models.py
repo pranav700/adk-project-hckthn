@@ -13,3 +13,12 @@ class RequestStatus(str, Enum):
 class StatusUpdate(BaseModel):
     request_id: str
     quote_status: RequestStatus
+
+
+# Define upload request model
+class UploadRequest(BaseModel):
+    id: str
+    user_id: str
+    session_id: str
+    mimetype: str
+    base64_data: str
