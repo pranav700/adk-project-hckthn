@@ -228,8 +228,48 @@ export default function RequestDetail() {
 
           <div className="flex-1 space-y-4">
             <div className="text-sm text-gray-700">
-              <span className="font-semibold">Latest Status:</span><StatusBadge status={latestStatus} />
+              <span className="font-semibold">Latest Status:</span>
+              <StatusBadge status={latestStatus} />
+
+              <div className="flex gap-2 mt-2">
+                <Button
+                  variant="default"
+                  disabled={latestStatus === 'accepted' || latestStatus === 'rejected'}
+                  onClick={async () => {
+                    try {
+                      await updateStatusApi({
+                        request_id: id?.toString() || '',
+                        quote_status: 'accepted',
+                      });
+                      setLatestStatus('accepted');
+                    } catch (error) {
+                      console.error('Error accepting request:', error);
+                    }
+                  }}
+                >
+                  Accept
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  disabled={latestStatus === 'accepted' || latestStatus === 'rejected'}
+                  onClick={async () => {
+                    try {
+                      await updateStatusApi({
+                        request_id: id?.toString() || '',
+                        quote_status: 'rejected',
+                      });
+                      setLatestStatus('rejected');
+                    } catch (error) {
+                      console.error('Error rejecting request:', error);
+                    }
+                  }}
+                >
+                  Reject
+                </Button>
+              </div>
             </div>
+
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Select Version</label>

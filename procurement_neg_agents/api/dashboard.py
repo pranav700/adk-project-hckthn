@@ -10,48 +10,76 @@ db = firestore.Client()
 def get_dashboard_data():
     try:
         versions_ref = db.collection("procurement_versions")
-        status_ref = db.collection("quote_status")
+        versions = list(versions_ref.stream())
 
-        # Stream all versions (consider adding a limit here)
-        versions = versions_ref.stream()
-
-        data = []
+        grouped = {}
         for doc in versions:
             v = doc.to_dict()
             request_id = v.get("request_id")
-            step_outputs = v.get("step_outputs", {})
-            ts = v.get("timestamp") or v.get("version_ts")
-            quote_status = v.get("quote_status")
+            if not request_id:
+                continue
 
-            # Firestore timestamps are usually Timestamp objects
+            ts = v.get("timestamp") or v.get("version_ts")
             if hasattr(ts, "to_datetime"):
                 last_updated = ts.to_datetime()
             elif isinstance(ts, str):
                 ts_fixed = ts.replace("Z", "+00:00")
                 last_updated = datetime.fromisoformat(ts_fixed)
             else:
-                last_updated = ts  # fallback, might be None
+                last_updated = ts or datetime.min
 
+            step_outputs = v.get("step_outputs", {})
             doc_agent = step_outputs.get("doc_agent", {})
-            quote_id = doc_agent.get("quote_id")
-            company_name = doc_agent.get("supplier_name")
+            entry = {
+                "last_updated": last_updated,
+                "quote_status": v.get("quote_status"),
+                "quote_id": doc_agent.get("quote_id"),
+                "company_name": doc_agent.get("supplier_name"),
+            }
 
-            data.append(
+            if request_id not in grouped:
+                grouped[request_id] = []
+            grouped[request_id].append(entry)
+
+        result = []
+        for request_id, versions in grouped.items():
+            # Sort all versions by last_updated descending
+            versions_sorted = sorted(
+                versions, key=lambda x: x["last_updated"], reverse=True
+            )
+            latest = versions_sorted[0]
+
+            # Try to fill missing quote_id and company_name from previous versions
+            quote_id = latest["quote_id"]
+            company_name = latest["company_name"]
+
+            if not quote_id or not company_name:
+                for v in versions_sorted[1:]:
+                    if not quote_id:
+                        quote_id = v.get("quote_id")
+                    if not company_name:
+                        company_name = v.get("company_name")
+                    if quote_id and company_name:
+                        break
+
+            # Skip if we still don't have required fields
+            if not quote_id or not company_name:
+                continue
+
+            result.append(
                 {
                     "request_id": request_id,
                     "quote_id": quote_id,
                     "company_name": company_name,
-                    "quote_status": quote_status,
-                    "last_updated": last_updated,
+                    "quote_status": latest["quote_status"],
+                    "last_updated": latest["last_updated"],
                 }
             )
 
-        # Sort by last_updated descending, limit 100
-        data = sorted(
-            data, key=lambda x: x["last_updated"] or datetime.min, reverse=True
-        )[:100]
+        # Sort final result by last_updated and limit to 100
+        result = sorted(result, key=lambda x: x["last_updated"], reverse=True)[:100]
 
-        return data
+        return result
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

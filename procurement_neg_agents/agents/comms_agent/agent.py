@@ -36,19 +36,20 @@ A. When given a 'Strategy' object, return:
   "html_body": string      // wrap 'email_body' from Strategy in <html><body>...</body></html>
 }
 
-B. When given a raw supplier reply (text), return:
-
-{
-  "action": "classify",
-  "sentiment": "positive" | "neutral" | "negative",
-  "intent": "accept" | "counter" | "reject" | "other",
-  "next_step": "close_deal" | "re_loop" | "escalate"
-}
-
-Rules:
-- If intent = "accept" → next_step = "close_deal"
-- If intent = "counter" → next_step = "re_loop"
-- If intent = "reject" AND sentiment = "negative" → next_step = "escalate"
 - Respond only with the required JSON object based on the input; no extra commentary.
 """,
 )
+
+# TO:DO
+# B. When given a raw supplier reply (text), return:
+
+# {
+#   "action": "classify",
+#   "sentiment": "positive" | "neutral" | "negative",
+#   "intent": "accept" | "counter" | "reject" | "other",
+#   "next_step": "close_deal" | "re_loop" | "escalate"
+# }
+# Rules:
+# - If intent = "accept" → next_step = "close_deal"
+# - If intent = "counter" → next_step = "re_loop"
+# - If intent = "reject" AND sentiment = "negative" → next_step = "escalate"
