@@ -43,7 +43,7 @@ jobs:
           docker buildx build \
            --platform linux/amd64 \
            --push \
-           -f ./procurement_neg_agents/Dockerfile \
+           -f ./procurement_neg_frontend/Dockerfile \
            -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
            -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
             .
