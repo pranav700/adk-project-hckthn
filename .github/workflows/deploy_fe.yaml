@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run
+name: Deploy Frontend to Cloud Run
 
 on:
   push:
@@ -50,10 +50,12 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          IMAGE="gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}"
-          gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE }} \
+          
+          gcloud run deploy $NAME \
             --image $IMAGE \
-            --region ${{ secrets.CLOUD_RUN_REGION }} \
+             --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
+            --region $REGION \
             --platform managed \
             --allow-unauthenticated \
+            --quiet \
             --set-env-vars NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
