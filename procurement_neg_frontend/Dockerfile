@@ -6,7 +6,7 @@ WORKDIR /app
 COPY procurement_neg_frontend/package*.json ./
 RUN npm install --production
 
-COPY . .
+COPY procurement_neg_frontend/ .
 
 RUN npm run build
 
