@@ -1,5 +1,4 @@
-# Use Node 18 alpine image
-FROM node:18-alpine
+FROM node:20-bullseye-slim
 
 WORKDIR /app
 
