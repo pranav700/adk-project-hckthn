@@ -1,33 +1,41 @@
-name: Deploy agents to Cloud Run
-on:
-  workflow_dispatch:
-  push:
-      branches: ["f/init", "main"]
+name: Deploy to Cloud Run
 
+on:
+  push:
+    branches: ["f/init", "main"]
 env:
-  IMAGE_NAME: agents-backend
+  IMAGE_NAME: agents-fe
   REGION: europe-west1
-  NAME: agents-backend
-  REGISTRY: agents-backend-gcr
+  NAME: agents-fe
+  REGISTRY: agents-fe-gcr
   TAG: ${{ github.sha }}
 
+
 jobs:
-  deployment:
+  deploy:
     if: github.actor == 'pranav700'
-    permissions:
-        contents: read
-        id-token: write
     runs-on: ubuntu-latest
     environment: adk-hackathon
 
     steps:
-      - name: CheckOut
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js app
+        run: npm run build
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
@@ -45,13 +53,13 @@ jobs:
            -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
            -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
             .
+
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy $NAME \
-            --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
-            --region $REGION \
+          IMAGE="gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}"
+          gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE }} \
+            --image $IMAGE \
+            --region ${{ secrets.CLOUD_RUN_REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --quiet \
-            --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=True,BQ_TABLE=${{secrets.BQ_TABLE}},GOOGLE_CLOUD_PROJECT=${{secrets.PROJECT_ID}},GOOGLE_CLOUD_LOCATION=${{env.REGION}}, \
-              GCS_BUCKET_NAME=${{secrets.GCS_BUCKET_NAME}},ALLOWED_ORIGINS=${{secrets.ALLOWED_ORIGINS}}"
+            --set-env-vars NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
