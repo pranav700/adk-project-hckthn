@@ -50,9 +50,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          
           gcloud run deploy $NAME \
-            --image $IMAGE \
              --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
             --region $REGION \
             --platform managed \
