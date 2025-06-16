@@ -10,7 +10,6 @@ env:
   NAME: agents-backend
   REGISTRY: agents-backend-gcr
   TAG: ${{ github.sha }}
-  ALLOWED_ORIGINS_SECRET: ${{ secrets.ALLOWED_ORIGINS }}
 
 
 jobs:
@@ -49,8 +48,6 @@ jobs:
             .
       - name: Deploy to Cloud Run
         run: |
-          ESCAPED_ALLOWED_ORIGINS=$(echo "$ALLOWED_ORIGINS_SECRET" | sed 's/"/\\"/g')
-
           gcloud run deploy $NAME \
             --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
             --region $REGION \
@@ -58,4 +55,4 @@ jobs:
             --allow-unauthenticated \
             --quiet \
             --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=True,BQ_TABLE=${{secrets.BQ_TABLE}},GOOGLE_CLOUD_PROJECT=${{secrets.PROJECT_ID}},GOOGLE_CLOUD_LOCATION=${{env.REGION}}, \
-              GCS_BUCKET_NAME=${{secrets.GCS_BUCKET_NAME}},ALLOWED_ORIGINS=${ESCAPED_ALLOWED_ORIGINS}"
+              GCS_BUCKET_NAME=${{secrets.GCS_BUCKET_NAME}},ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}"

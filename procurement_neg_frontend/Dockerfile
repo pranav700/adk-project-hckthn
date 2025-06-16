@@ -3,7 +3,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY procurement_neg_frontend/package*.json ./
 RUN npm install --production
 
 COPY . .
