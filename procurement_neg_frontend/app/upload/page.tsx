@@ -15,6 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { generateRequestId, saveVersionApi, updateStatusApi } from '@/lib/api/rest/procurement';
 import StatusBadge from '@/components/StatusBadge';
+import { uploadFileApi } from '@/lib/api/rest/filehandler';
 
 
 export default function UploadPage() {
@@ -30,6 +31,8 @@ export default function UploadPage() {
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const [customMessage, setCustomMessage] = useState("Processing your procurement request...");
   const [status, setStatus] = useState<'pending' | 'countered' | string>('pending');
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+
 
 
   PROCUREMENT_AGENTS.forEach(agent => {
@@ -154,6 +157,13 @@ export default function UploadPage() {
           });
         } catch (error) {
           console.error('Error saving version:', error);
+        }
+
+        //now upload the file
+        try {
+          await uploadFileApi(base64Data, file.type, id, sessionInfo.userId, sessionInfo.sessionId);
+        } catch (error) {
+          console.error('Error uploading file:', error);
         }
 
       } else {

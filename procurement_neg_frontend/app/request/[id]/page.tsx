@@ -15,6 +15,7 @@ import OverviewCard from '@/components/OverviewCard';
 import EmailDraftEditor from '@/components/EmailDraftEditor';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
+import FileViewer from '@/components/FileViewer';
 
 
 
@@ -210,8 +211,6 @@ export default function RequestDetail() {
           )}
         </DialogContent>
       </Dialog>
-
-
       <div className="p-4 bg-white rounded-lg shadow flex flex-col md:flex-row gap-6">
 
         {/* Left column (Vertical Tabs and Status) */}
@@ -298,6 +297,13 @@ export default function RequestDetail() {
             <div className="text-sm text-gray-600">
               <span className="font-semibold">Uploaded File:</span> {uploadedFileName}
             </div>
+          )}
+          {versions[0] && (
+            <FileViewer
+              requestId={id?.toString() || ''}
+              userId={versions[0].user_id}
+              sessionId={versions[0].session_id}
+            />
           )}
         </div>
       </div>
