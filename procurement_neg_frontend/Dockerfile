@@ -3,11 +3,14 @@ FROM node:20-bullseye-slim
 WORKDIR /app
 
 COPY procurement_neg_frontend/package*.json ./
-RUN npm install --production
+RUN npm install
 
 COPY procurement_neg_frontend/ .
 
 RUN npm run build
+
+ENV NODE_ENV=production
+
 
 EXPOSE 3000
 
