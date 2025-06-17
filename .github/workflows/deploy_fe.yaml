@@ -43,6 +43,7 @@ jobs:
           docker buildx build \
            --platform linux/amd64 \
            --push \
+           --build-arg NEXT_PUBLIC_BACKEND_API=${{ secrets.NEXT_PUBLIC_BACKEND_URL }} \
            -f ./procurement_neg_frontend/Dockerfile \
            -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
            -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
