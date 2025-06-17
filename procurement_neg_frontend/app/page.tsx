@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DashboardEntry, fetchDashboardData } from '@/lib/api/rest/dashboard';
