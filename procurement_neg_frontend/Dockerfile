@@ -5,19 +5,18 @@ WORKDIR /app
 COPY procurement_neg_frontend/package*.json ./
 RUN npm install
 
+# Copy the rest of the app
 COPY procurement_neg_frontend/ ./
 
-# 👇 Add this BEFORE build step to create .env.production.local
-ARG NEXT_PUBLIC_BACKEND_API
-RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env
+# 👇 Copy the env file into the build context
+COPY procurement_neg_frontend/.env.production .env.production
 
-# 👇 Verify it's there
-RUN cat .env
+# 👇 Show what's in the file for debug
+RUN cat .env.production
 
-# Build step (Next.js will read from .env.production.local)
+# 👇 Build with env already present
 RUN npm run build
 
-
-EXPOSE 3000
-
+EXPOSE 8080
+ENV NODE_ENV=production
 CMD ["npm", "start"]

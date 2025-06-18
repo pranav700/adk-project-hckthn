@@ -9,6 +9,7 @@ import { Icons } from '@/components/Icons';
 import { statusMap } from '@/lib/constants';
 
 
+console.log("API from ENV:", process.env.NEXT_PUBLIC_BACKEND_API);
 
 
 export default function Dashboard() {
