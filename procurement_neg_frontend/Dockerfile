@@ -8,13 +8,12 @@ RUN npm install
 # Copy the rest of the app
 COPY procurement_neg_frontend/ ./
 
-# 👇 Copy the env file into the build context
-COPY procurement_neg_frontend/.env.production .env.production
-
-# 👇 Show what's in the file for debug
+# Copy the env file into the build context
+ARG NEXT_PUBLIC_BACKEND_API RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env.production
+# Show what's in the file for debug
 RUN cat .env.production
 
-# 👇 Build with env already present
+# Build with env already present
 RUN npm run build
 
 EXPOSE 8080
