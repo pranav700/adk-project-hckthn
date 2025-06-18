@@ -9,7 +9,8 @@ RUN npm install
 COPY procurement_neg_frontend/ ./
 
 # Copy the env file into the build context
-ARG NEXT_PUBLIC_BACKEND_API RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env.production
+ARG NEXT_PUBLIC_BACKEND_API 
+RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env.production
 # Show what's in the file for debug
 RUN cat .env.production
 
