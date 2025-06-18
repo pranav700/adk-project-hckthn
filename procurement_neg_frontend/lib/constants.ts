@@ -3,6 +3,9 @@ import OverviewCard from '@/components/OverviewCard';
 import StrategyCard from '@/components/StrategyCard';
 import SupplierQuoteCard from '@/components/SupplierQuoteCard';
 import { v4 as uuidv4 } from 'uuid';
+import './envConfig.ts'
+
+export const BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 
 export const PROCUREMENT_STEPS = ['Overview', 'Quote Analysis', 'Strategy', 'Draft'];
@@ -15,8 +18,6 @@ export function getNextRequestId(): string {
   localStorage.setItem('procurement-req-counter', nextId.toString());
   return `REQ-${nextId}`;
 }
-
-export const BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const APP_NAME = 'procurement_agent';
 export const USER_ID = 'u_123';
