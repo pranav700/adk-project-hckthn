@@ -6,6 +6,9 @@ import logging
 import os
 
 from modals.models import UploadRequest
+from google.auth.transport import requests
+from google.auth import default, compute_engine
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -58,8 +61,18 @@ def generate_signed_url(id: str, user_id: str, session_id: str):
     if not blobs:
         raise HTTPException(status_code=404, detail="File not found")
 
+    credentials, _ = default()
+    auth_request = requests.Request()
+    credentials.refresh(auth_request)
+
+    signing_credentials = compute_engine.IDTokenCredentials(
+        auth_request, "", service_account_email=credentials.service_account_email
+    )
+
     blob = blobs[0]
     signed_url = blob.generate_signed_url(
-        expiration=timedelta(minutes=15), method="GET"
+        expiration=timedelta(minutes=15),
+        method="GET",
+        credentials=signing_credentials,
     )
     return {"url": signed_url}
