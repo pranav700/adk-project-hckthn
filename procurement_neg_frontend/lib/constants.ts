@@ -3,7 +3,6 @@ import OverviewCard from '@/components/OverviewCard';
 import StrategyCard from '@/components/StrategyCard';
 import SupplierQuoteCard from '@/components/SupplierQuoteCard';
 import { v4 as uuidv4 } from 'uuid';
-import './envConfig.ts'
 
 export const BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
