@@ -9,6 +9,8 @@ COPY procurement_neg_frontend/ .
 
 ARG NEXT_PUBLIC_BACKEND_API
 ENV NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API
+RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env.production.local
+
 
 RUN npm run build
 
