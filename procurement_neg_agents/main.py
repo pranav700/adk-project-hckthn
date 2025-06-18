@@ -29,7 +29,7 @@ logging.info(f"Agent directory: {AGENT_DIR}")
 # Example allowed origins for CORS
 ALLOWED_ORIGINS = json.loads(os.environ["ALLOWED_ORIGINS"])
 # Set web=True if you intend to serve a web interface, False otherwise
-SERVE_WEB_INTERFACE = True
+SERVE_WEB_INTERFACE = False
 
 # Call the function to get the FastAPI app instance
 
