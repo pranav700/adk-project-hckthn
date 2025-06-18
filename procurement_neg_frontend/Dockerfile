@@ -9,10 +9,10 @@ COPY procurement_neg_frontend/ ./
 
 # 👇 Add this BEFORE build step to create .env.production.local
 ARG NEXT_PUBLIC_BACKEND_API
-RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env.production.local
+RUN echo "NEXT_PUBLIC_BACKEND_API=$NEXT_PUBLIC_BACKEND_API" > .env.production
 
 # 👇 Verify it's there
-RUN cat .env.production.local
+RUN cat .env.production
 
 # Build step (Next.js will read from .env.production.local)
 RUN npm run build
