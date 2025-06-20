@@ -47,7 +47,7 @@ export default function OverviewCard({ quote }: OverviewCardProps) {
               <td className="py-1">{row.description}</td>
               <td className="py-1">{row.quantity}</td>
               <td className="py-1">{row.unit_of_measure}</td>
-              <td className="py-1">{row.unit_price.toFixed(2)}</td>
+              <td className="py-1">{row.unit_price?.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>

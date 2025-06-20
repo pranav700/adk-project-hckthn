@@ -42,7 +42,7 @@ const StrategyCard = ({ quote }: CounterOfferProps) => {
             {quote.counter_offer_rows.map((row, i) => (
               <tr key={i} className="border-t border-gray-200">
                 <td className="p-3">{row.item}</td>
-                <td className="p-3">${row.counter_price.toFixed(2)}</td>
+                <td className="p-3">${row.counter_price?.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
