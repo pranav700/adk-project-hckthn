@@ -41,7 +41,7 @@ export default function OverviewCard({ quote }: OverviewCardProps) {
           </tr>
         </thead>
         <tbody>
-          {quote.sku_rows.map((row, idx) => (
+          {quote?.sku_rows?.map((row, idx) => (
             <tr key={idx} className="odd:bg-gray-50">
               <td className="py-1">{row.item}</td>
               <td className="py-1">{row.description}</td>
