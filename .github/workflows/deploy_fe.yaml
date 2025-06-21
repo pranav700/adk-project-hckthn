@@ -1,0 +1,60 @@
+name: Deploy Frontend to Cloud Run
+
+on:
+  push:
+    branches: ["main"]
+env:
+  IMAGE_NAME: agents-fe
+  REGION: europe-west1
+  NAME: agents-fe
+  REGISTRY: agents-fe-gcr
+  TAG: ${{ github.sha }}
+
+
+jobs:
+  deploy:
+    if: github.actor == 'pranav700'
+    runs-on: ubuntu-latest
+    environment: adk-hackathon
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and push Docker image
+        run: |
+          docker buildx build \
+           --platform linux/amd64 \
+           --push \
+           --build-arg NEXT_PUBLIC_BACKEND_API=${{ secrets.NEXT_PUBLIC_BACKEND_URL }} \
+           -f ./procurement_neg_frontend/Dockerfile \
+           -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
+           -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
+            .
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $NAME \
+             --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --quiet \
+            --set-env-vars NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}

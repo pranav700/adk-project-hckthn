@@ -1,0 +1,58 @@
+name: Deploy agents to Cloud Run
+on:
+  workflow_dispatch:
+  push:
+      branches: ["main"]
+
+env:
+  IMAGE_NAME: agents-backend
+  REGION: europe-west1
+  NAME: agents-backend
+  REGISTRY: agents-backend-gcr
+  TAG: ${{ github.sha }}
+
+
+jobs:
+  deployment:
+    if: github.actor == 'pranav700'
+    permissions:
+        contents: read
+        id-token: write
+    runs-on: ubuntu-latest
+    environment: adk-hackathon
+
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and push Docker image
+        run: |
+          docker buildx build \
+           --platform linux/amd64 \
+           --push \
+           -f ./procurement_neg_agents/Dockerfile \
+           -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
+           -t ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:latest \
+            .
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $NAME \
+            --image ${{env.REGION}}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{env.REGISTRY}}/${{env.NAME}}:${{env.TAG}} \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --quiet \
+            --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=True,BQ_TABLE=${{secrets.BQ_TABLE}},GOOGLE_CLOUD_PROJECT=${{secrets.PROJECT_ID}},GOOGLE_CLOUD_LOCATION=${{env.REGION}}, \
+              GCS_BUCKET_NAME=${{secrets.GCS_BUCKET_NAME}},ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}"
