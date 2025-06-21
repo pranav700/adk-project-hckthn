@@ -2,7 +2,7 @@ name: Deploy Frontend to Cloud Run
 
 on:
   push:
-    branches: ["f/init", "main"]
+    branches: ["main"]
 env:
   IMAGE_NAME: agents-fe
   REGION: europe-west1

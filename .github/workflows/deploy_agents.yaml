@@ -2,7 +2,7 @@ name: Deploy agents to Cloud Run
 on:
   workflow_dispatch:
   push:
-      branches: ["f/init", "main"]
+      branches: ["main"]
 
 env:
   IMAGE_NAME: agents-backend
