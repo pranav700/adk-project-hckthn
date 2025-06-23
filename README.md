@@ -91,7 +91,7 @@ CMD ["npm", "run", "dev"]
   ![Project Screenshot](./docs/architecture.jpg)
 
 
-- **Sample Supplier Quotes** – `sample_quotes/`  
+- **Sample Supplier Quotes** – `docs/`  
   Contains test data from public sources (Google) used during development.
 
 ---
